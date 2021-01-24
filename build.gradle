@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'net.dv8tion:JDA:4.2.0_222'
+    compile 'net.dv8tion:JDA:4.2.0_227'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
