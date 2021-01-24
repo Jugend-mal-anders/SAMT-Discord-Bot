@@ -2,13 +2,17 @@ package listener;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import storage.Container;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class ReactionListener extends ListenerAdapter {
@@ -88,6 +92,14 @@ public class ReactionListener extends ListenerAdapter {
     }};
 
     /**
+     * MessageID's for message where only one reaction is allowed
+     */
+    private static final List<Long> onlyOneReaction = new ArrayList<Long>() {{
+        add(783057633354580019L);
+        add(783058774964699197L);
+    }};
+
+    /**
      * Static channelID as there is only one channel for rules
      */
     private static final long channelID = 760590649334169657L;
@@ -103,6 +115,7 @@ public class ReactionListener extends ListenerAdapter {
         //Roles Management
         Member member = event.getMember();
         Long messageID = event.getMessageIdLong();
+
         if (member != null && rolesList.containsKey(messageID) && !event.getUser().isBot()) {
             HashMap<String, Long> roles = rolesList.get(messageID);
             try {
@@ -114,6 +127,26 @@ public class ReactionListener extends ListenerAdapter {
                 String name = event.getReactionEmote().getName();
                 if (roles.containsKey(name)) {
                     event.getGuild().addRoleToMember(member, event.getGuild().getRoleById(roles.get(name))).complete();
+                }
+            }
+        }
+
+        if (!event.getUser().isBot() && onlyOneReaction.contains(messageID)) {
+            User user = event.getUser();
+            Message m = event.retrieveMessage().complete();
+            Boolean found = false;
+            for (MessageReaction mr : m.getReactions()) {
+                if (!mr.getReactionEmote().equals(event.getReactionEmote())) {
+                    List<User> users = mr.retrieveUsers().complete();
+                    for (User u : users) {
+                        if (u.equals(user)) {
+                            mr.removeReaction(u).complete();
+                            event.getGuild().removeRoleFromMember(member, event.getGuild().getRoleById(rolesList.get(messageID).get(mr.getReactionEmote().getAsCodepoints()))).complete();
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) break;
                 }
             }
         }

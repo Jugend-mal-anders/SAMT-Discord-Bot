@@ -13,6 +13,7 @@ public class StartStopListener extends ListenerAdapter {
     @Override
     public void onShutdown(@Nonnull ShutdownEvent event) {
         LocalSafeHandler.saveData();
+        System.exit(event.getCode());
     }
 
     @Override
