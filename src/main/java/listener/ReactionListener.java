@@ -88,6 +88,7 @@ public class ReactionListener extends ListenerAdapter {
             put("DiamondSword", 783076065656569868L);
             put("Valorant", 783076090893041694L);
             put("overwatch", 783076133444255774L);
+            put("osu", 805465800969682944L);
         }});
     }};
 
